@@ -1,12 +1,17 @@
-import React from "react";
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+﻿import React, { useState } from "react";
+import { BrowserRouter as Router, Routes, Route, Link, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 
-/* GLOBAL BRAND COLORS */
 const brandYellow = "text-yellow-400";
 const brandYellowBg = "bg-yellow-500 hover:bg-yellow-400";
 
-/* NAVBAR */
+let initialProducts = [
+  { id: 1, name: "Hoodie", price: 50000, img: "/products/hoodie.png" },
+  { id: 2, name: "Cap", price: 12000, img: "/products/cap.png" },
+  { id: 3, name: "T-Shirt", price: 20000, img: "/products/tshirt.png" },
+];
+
+/* Navbar */
 const Navbar = () => (
   <header className="flex justify-between items-center py-4 px-6 bg-black border-b border-white/10">
     <Link to="/" className={`text-3xl font-bold ${brandYellow}`}>Onset Nation</Link>
@@ -16,109 +21,186 @@ const Navbar = () => (
       <Link to="/gallery" className="hover:text-gray-300">Gallery</Link>
       <Link to="/philosophy" className="hover:text-gray-300">Philosophy</Link>
       <Link to="/contact" className="hover:text-gray-300">Contact</Link>
+      <Link to="/admin" className="hover:text-gray-300">Admin</Link>
     </nav>
   </header>
 );
 
-/* HERO HOME */
+/* Home */
 const Home = () => (
   <div className="p-6">
-    <motion.section
-      className="mt-16 text-center relative p-16 rounded-2xl"
-      initial={{ opacity: 0, y: -50 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 1 }}
-      style={{ backgroundImage: 'url(/hero-bg.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' }}
-    >
+    <motion.section className="mt-16 text-center relative p-16 rounded-2xl" initial={{ opacity: 0, y: -50 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1 }} style={{ backgroundImage: "url(/hero-bg.jpg)", backgroundSize: "cover", backgroundPosition: "center" }}>
       <h2 className={`text-5xl font-bold mb-4 ${brandYellow}`}>Wear Your Beginning</h2>
-      <p className="text-gray-300 max-w-2xl mx-auto text-lg">
-        Onset Nation is more than a brand  it's ambition, identity, hustle, and new beginnings.
-      </p>
+      <p className="text-gray-300 max-w-2xl mx-auto text-lg">Onset Nation is more than a brand  it is ambition, identity, hustle, and new beginnings.</p>
       <Link to="/shop">
-        <motion.button className={`mt-8 px-6 py-3 rounded-xl font-semibold ${brandYellowBg} text-black`} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-          Shop Now
-        </motion.button>
+        <motion.button className={`mt-8 px-6 py-3 rounded-xl font-semibold ${brandYellowBg} text-black`} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>Shop Now</motion.button>
       </Link>
     </motion.section>
   </div>
 );
 
-/* SHOP PAGE */
-const products = [
-  { id: 1, name: "Onset Hoodie", price: "18,000 MWK", img: "/products/hoodie.png" },
-  { id: 2, name: "Onset Cap", price: "7,500 MWK", img: "/products/cap.png" },
-  { id: 3, name: "Onset T-Shirt", price: "10,000 MWK", img: "/products/tshirt.png" },
-];
+/* Shop */
+const Shop = () => {
+  const [products, setProducts] = useState(initialProducts);
+  return (
+    <div className="p-6">
+      <h2 className={`text-4xl font-bold mb-8 ${brandYellow}`}>Shop</h2>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {products.map((p, i) => (
+          <motion.div key={p.id} className="bg-white/10 p-6 rounded-2xl shadow-xl flex flex-col items-center" initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.2 }}>
+            <img src={p.img} alt={p.name} className="w-40 h-40 object-contain mb-4" />
+            <h3 className={`text-2xl font-semibold mb-1 ${brandYellow}`}>{p.name}</h3>
+            <p className="text-gray-300 mb-4">Price: {p.price} MWK</p>
+            <Link to={`/product/${p.id}`} className={`px-4 py-2 rounded-xl font-semibold ${brandYellowBg}`}>View Product</Link>
+          </motion.div>
+        ))}
+      </div>
+    </div>
+  );
+};
 
-const Shop = () => (
+/* Gallery */
+const Gallery = () => (
   <div className="p-6">
-    <h2 className={`text-4xl font-bold mb-8 ${brandYellow}`}>Shop</h2>
+    <h2 className={`text-4xl font-bold mb-8 ${brandYellow}`}>Gallery</h2>
     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-      {products.map((p, i) => (
-        <motion.div key={p.id} className="bg-white/10 p-6 rounded-2xl shadow-xl flex flex-col items-center" initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.2 }}>
-          <img src={p.img} alt={p.name} className="w-40 h-40 object-contain mb-4" />
-          <h3 className={`text-2xl font-semibold mb-1 ${brandYellow}`}>{p.name}</h3>
-          <p className="text-gray-300 mb-4">{p.price}</p>
-          <Link to={`/product/${p.id}`} className={`px-4 py-2 rounded-xl font-semibold ${brandYellowBg}`}>View Product</Link>
+      {[1, 2, 3, 4, 5, 6].map((i) => (
+        <motion.div key={i} className="bg-white/10 rounded-2xl overflow-hidden" initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} transition={{ duration: 0.5 }}>
+          <img src={`/gallery/img${i}.jpg`} alt={`Gallery ${i}`} className="w-full h-64 object-cover hover:scale-110 transition-transform" />
         </motion.div>
       ))}
     </div>
   </div>
 );
 
-/* PRODUCT PAGE */
-const ProductPage = ({ id }) => {
-  const product = products.find(p => p.id === Number(id));
+/* Philosophy */
+const Philosophy = () => (
+  <div className="p-6 max-w-3xl mx-auto">
+    <h2 className={`text-4xl font-bold mb-6 ${brandYellow}`}>Philosophy</h2>
+    <p className="text-gray-300 leading-relaxed mb-4">
+      Onset Nation stands for new beginnings, resilience, and the fire of the young hustler.
+    </p>
+    <p className="text-gray-300 leading-relaxed mb-4">
+      This brand celebrates every step of the grind  from the struggles of Chigumula to the rise of Chilobwe, from ambition to identity, from hustle to legacy.
+    </p>
+    <p className="text-gray-300 leading-relaxed">
+      Every piece you wear is a statement. It says you are ready, you are ambitious, and you believe in new beginnings.
+    </p>
+  </div>
+);
+
+/* Contact */
+const Contact = () => (
+  <div className="p-6 max-w-3xl mx-auto">
+    <h2 className={`text-4xl font-bold mb-6 ${brandYellow}`}>Contact Us</h2>
+    <div className="bg-white/10 rounded-xl p-8">
+      <p className="text-gray-300 mb-4">Get in touch for orders, collaborations, or custom designs.</p>
+      <p className="text-lg font-semibold mb-2">WhatsApp: <a href="https://wa.me/265886147600" className={`${brandYellow} hover:underline`}>+265 886 147 600</a></p>
+      <p className="text-lg font-semibold">Email: onset.nation@example.com</p>
+    </div>
+  </div>
+);
+
+/* Product Page */
+const ProductPage = () => {
+  const { id } = useParams();
+  const product = initialProducts.find(p => p.id === Number(id));
   if (!product) return <p className="p-6 text-red-500">Product not found.</p>;
+  return (
+    <div className="p-6 flex flex-col md:flex-row gap-12">
+      <img src={product.img} className="w-72 h-72 object-contain" alt={product.name} />
+      <div>
+        <h2 className={`text-4xl font-bold mb-4 ${brandYellow}`}>{product.name}</h2>
+        <p className="text-xl text-gray-300 mb-6">Price: {product.price} MWK</p>
+        <a href="https://wa.me/265886147600" className={`px-6 py-3 rounded-xl font-semibold ${brandYellowBg} inline-block text-black`}>Order Now</a>
+      </div>
+    </div>
+  );
+};
+
+/* Admin Login */
+const AdminLogin = ({ onLogin }) => {
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+
+  const handleLogin = () => {
+    if (password === "OnsetAdmin123") {
+      onLogin(true);
+    } else {
+      setError("Wrong password!");
+    }
+  };
+
+  return (
+    <div className="p-6 max-w-md mx-auto mt-20 bg-white/10 rounded-xl text-center">
+      <h2 className="text-2xl font-bold mb-4 text-yellow-400">Admin Login</h2>
+      <input type="password" placeholder="Enter password" value={password} onChange={e => setPassword(e.target.value)} className="p-2 rounded text-black w-full mb-4" />
+      <button onClick={handleLogin} className="px-4 py-2 bg-yellow-500 hover:bg-yellow-400 rounded font-semibold text-black">Login</button>
+      {error && <p className="text-red-500 mt-2">{error}</p>}
+    </div>
+  );
+};
+
+/* Admin Dashboard */
+const Admin = () => {
+  const [products, setProducts] = useState(initialProducts);
+  const [name, setName] = useState("");
+  const [price, setPrice] = useState("");
+  const [img, setImg] = useState("");
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    const reader = new FileReader();
+    reader.onloadend = () => setImg(reader.result);
+    if(file) reader.readAsDataURL(file);
+  };
+
+  const addProduct = () => {
+    const newProduct = { id: Date.now(), name, price: Number(price), img };
+    const updated = [...products, newProduct];
+    setProducts(updated);
+    initialProducts = updated;
+    setName(""); setPrice(""); setImg("");
+  };
+
+  const deleteProduct = (id) => {
+    const updated = products.filter(p => p.id !== id);
+    setProducts(updated);
+    initialProducts = updated;
+  };
 
   return (
     <div className="p-6">
-      <div className="flex flex-col md:flex-row gap-12">
-        <img src={product.img} className="w-72 h-72 object-contain" />
-        <div>
-          <h2 className={`text-4xl font-bold mb-4 ${brandYellow}`}>{product.name}</h2>
-          <p className="text-xl text-gray-300 mb-6">Price: {product.price}</p>
-          <a href="https://wa.me/265886147600" className={`px-6 py-3 rounded-xl font-semibold ${brandYellowBg} inline-block`}>Order Now</a>
+      <h2 className={`text-4xl font-bold mb-6 ${brandYellow}`}>Admin Dashboard</h2>
+      <div className="mb-6 border-b border-white/20 pb-6">
+        <h3 className={`text-2xl mb-2 ${brandYellow}`}>Add Product</h3>
+        <input placeholder="Name" value={name} onChange={e => setName(e.target.value)} className="p-2 mr-2 rounded text-black mb-2" />
+        <input placeholder="Price" value={price} onChange={e => setPrice(e.target.value)} className="p-2 mr-2 rounded text-black mb-2" />
+        <input type="file" onChange={handleImageUpload} className="p-2 rounded text-black mb-2" />
+        <button onClick={addProduct} className={`px-4 py-2 ${brandYellowBg} rounded font-semibold text-black`}>Add</button>
+      </div>
+      <div>
+        <h3 className={`text-2xl mb-4 ${brandYellow}`}>Existing Products</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {products.map(p => (
+            <div key={p.id} className="bg-white/10 p-4 rounded-xl flex flex-col items-center">
+              <img src={p.img} className="w-32 h-32 object-contain mb-2" alt={p.name} />
+              <h4 className={brandYellow}>{p.name}</h4>
+              <p className="text-gray-300">Price: {p.price} MWK</p>
+              <button onClick={() => deleteProduct(p.id)} className={`mt-2 px-3 py-1 rounded ${brandYellowBg} text-black`}>Delete</button>
+            </div>
+          ))}
         </div>
       </div>
     </div>
   );
 };
 
-/* GALLERY */
-const Gallery = () => (
-  <div className="p-6">
-    <h2 className={`text-4xl font-bold mb-6 ${brandYellow}`}>Gallery</h2>
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-      {[1,2,3,4,5,6,7,8].map(i => (
-        <motion.div key={i} className="bg-white/10 p-4 rounded-xl" initial={{ opacity: 0 }} whileInView={{ opacity: 1 }}>
-          <img src={`/gallery/img${i}.jpg`} className="w-full h-40 object-cover rounded-lg" />
-        </motion.div>
-      ))}
-    </div>
-  </div>
-);
+const AdminWrapper = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  return isLoggedIn ? <Admin /> : <AdminLogin onLogin={setIsLoggedIn} />;
+};
 
-/* PHILOSOPHY */
-const Philosophy = () => (
-  <div className="p-6 max-w-3xl">
-    <h2 className={`text-4xl font-bold mb-6 ${brandYellow}`}>Philosophy</h2>
-    <p className="text-gray-300 leading-relaxed">Onset Nation stands for beginnings, hustle, identity, resilience and legacy. It represents the journey from Chigumula to Chilobwe, from dreaming to doing, from surviving to rising.</p>
-  </div>
-);
-
-/* CONTACT PAGE */
-const Contact = () => (
-  <div className="p-6">
-    <h2 className={`text-4xl font-bold mb-4 ${brandYellow}`}>Contact</h2>
-    <p className="text-gray-300">WhatsApp: +265 886147600 (Enerst Chipula)</p>
-    <p className="text-gray-300">Email: enerstchipula@gmail.com</p>
-    <p className="text-gray-300">Location: Chilobwe, Blantyre</p>
-    <a href="https://wa.me/265886147600" className={`mt-6 inline-block px-6 py-3 rounded-xl font-semibold ${brandYellowBg}`}>Chat on WhatsApp</a>
-  </div>
-);
-
-/* FOOTER */
 const Footer = () => (
   <footer className="text-center text-gray-500 py-6 mt-12 border-t border-white/10">
     <div className="flex justify-center gap-8 mb-4">
@@ -141,15 +223,11 @@ export default function OnsetNation() {
           <Route path="/gallery" element={<Gallery />} />
           <Route path="/philosophy" element={<Philosophy />} />
           <Route path="/contact" element={<Contact />} />
-          <Route path="/product/:id" element={<DynamicProduct />} />
+          <Route path="/product/:id" element={<ProductPage />} />
+          <Route path="/admin" element={<AdminWrapper />} />
         </Routes>
         <Footer />
       </div>
     </Router>
   );
 }
-
-const DynamicProduct = (props) => {
-  const id = window.location.pathname.split("/").pop();
-  return <ProductPage id={id} />;
-};
