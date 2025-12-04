@@ -1,14 +1,16 @@
-﻿import React, { useState } from "react";
+﻿import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Link, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
+import { db } from "./firebase";
+import { collection, getDocs, addDoc, deleteDoc, doc } from "firebase/firestore";
 
 const brandYellow = "text-yellow-400";
 const brandYellowBg = "bg-yellow-500 hover:bg-yellow-400";
 
-let initialProducts = [
-  { id: 1, name: "Hoodie", price: 50000, img: "/products/hoodie.png" },
-  { id: 2, name: "Cap", price: 12000, img: "/products/cap.png" },
-  { id: 3, name: "T-Shirt", price: 20000, img: "/products/tshirt.png" },
+const initialProducts = [
+  { id: "1", name: "Hoodie", price: 50000, img: "/products/hoodie.png" },
+  { id: "2", name: "Cap", price: 12000, img: "/products/cap.png" },
+  { id: "3", name: "T-Shirt", price: 20000, img: "/products/tshirt.png" },
 ];
 
 /* Navbar */
@@ -39,25 +41,22 @@ const Home = () => (
   </div>
 );
 
-/* Shop */
-const Shop = () => {
-  const [products, setProducts] = useState(initialProducts);
-  return (
-    <div className="p-6">
-      <h2 className={`text-4xl font-bold mb-8 ${brandYellow}`}>Shop</h2>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {products.map((p, i) => (
-          <motion.div key={p.id} className="bg-white/10 p-6 rounded-2xl shadow-xl flex flex-col items-center" initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.2 }}>
-            <img src={p.img} alt={p.name} className="w-40 h-40 object-contain mb-4" />
-            <h3 className={`text-2xl font-semibold mb-1 ${brandYellow}`}>{p.name}</h3>
-            <p className="text-gray-300 mb-4">Price: {p.price} MWK</p>
-            <Link to={`/product/${p.id}`} className={`px-4 py-2 rounded-xl font-semibold ${brandYellowBg}`}>View Product</Link>
-          </motion.div>
-        ))}
-      </div>
+/* Shop - Uses Firebase */
+const Shop = ({ products }) => (
+  <div className="p-6">
+    <h2 className={`text-4xl font-bold mb-8 ${brandYellow}`}>Shop</h2>
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      {products.map((p, i) => (
+        <motion.div key={p.id} className="bg-white/10 p-6 rounded-2xl shadow-xl flex flex-col items-center" initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.2 }}>
+          <img src={p.img} alt={p.name} className="w-40 h-40 object-contain mb-4" />
+          <h3 className={`text-2xl font-semibold mb-1 ${brandYellow}`}>{p.name}</h3>
+          <p className="text-gray-300 mb-4">Price: {p.price} MWK</p>
+          <Link to={`/product/${p.id}`} className={`px-4 py-2 rounded-xl font-semibold ${brandYellowBg}`}>View Product</Link>
+        </motion.div>
+      ))}
     </div>
-  );
-};
+  </div>
+);
 
 /* Gallery */
 const Gallery = () => (
@@ -102,9 +101,9 @@ const Contact = () => (
 );
 
 /* Product Page */
-const ProductPage = () => {
+const ProductPage = ({ products }) => {
   const { id } = useParams();
-  const product = initialProducts.find(p => p.id === Number(id));
+  const product = products.find(p => p.id === id);
   if (!product) return <p className="p-6 text-red-500">Product not found.</p>;
   return (
     <div className="p-6 flex flex-col md:flex-row gap-12">
@@ -141,12 +140,12 @@ const AdminLogin = ({ onLogin }) => {
   );
 };
 
-/* Admin Dashboard */
-const Admin = () => {
-  const [products, setProducts] = useState(initialProducts);
+/* Admin Dashboard - Uses Firebase */
+const Admin = ({ products, onProductsChange }) => {
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [img, setImg] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
@@ -155,18 +154,36 @@ const Admin = () => {
     if(file) reader.readAsDataURL(file);
   };
 
-  const addProduct = () => {
-    const newProduct = { id: Date.now(), name, price: Number(price), img };
-    const updated = [...products, newProduct];
-    setProducts(updated);
-    initialProducts = updated;
-    setName(""); setPrice(""); setImg("");
+  const addProduct = async () => {
+    if (!name || !price || !img) {
+      alert("Please fill all fields and upload an image");
+      return;
+    }
+    setLoading(true);
+    try {
+      const newProduct = { name, price: Number(price), img };
+      const docRef = await addDoc(collection(db, "products"), newProduct);
+      onProductsChange([...products, { id: docRef.id, ...newProduct }]);
+      setName(""); setPrice(""); setImg("");
+      alert("Product added successfully!");
+    } catch (error) {
+      console.error("Error adding product:", error);
+      alert("Error adding product. Check Firebase config.");
+    }
+    setLoading(false);
   };
 
-  const deleteProduct = (id) => {
-    const updated = products.filter(p => p.id !== id);
-    setProducts(updated);
-    initialProducts = updated;
+  const deleteProduct = async (id) => {
+    setLoading(true);
+    try {
+      await deleteDoc(doc(db, "products", id));
+      onProductsChange(products.filter(p => p.id !== id));
+      alert("Product deleted!");
+    } catch (error) {
+      console.error("Error deleting product:", error);
+      alert("Error deleting product.");
+    }
+    setLoading(false);
   };
 
   return (
@@ -174,10 +191,10 @@ const Admin = () => {
       <h2 className={`text-4xl font-bold mb-6 ${brandYellow}`}>Admin Dashboard</h2>
       <div className="mb-6 border-b border-white/20 pb-6">
         <h3 className={`text-2xl mb-2 ${brandYellow}`}>Add Product</h3>
-        <input placeholder="Name" value={name} onChange={e => setName(e.target.value)} className="p-2 mr-2 rounded text-black mb-2" />
-        <input placeholder="Price" value={price} onChange={e => setPrice(e.target.value)} className="p-2 mr-2 rounded text-black mb-2" />
-        <input type="file" onChange={handleImageUpload} className="p-2 rounded text-black mb-2" />
-        <button onClick={addProduct} className={`px-4 py-2 ${brandYellowBg} rounded font-semibold text-black`}>Add</button>
+        <input placeholder="Name" value={name} onChange={e => setName(e.target.value)} className="p-2 mr-2 rounded text-black mb-2" disabled={loading} />
+        <input placeholder="Price (MWK)" value={price} onChange={e => setPrice(e.target.value)} className="p-2 mr-2 rounded text-black mb-2" disabled={loading} />
+        <input type="file" onChange={handleImageUpload} className="p-2 rounded text-black mb-2" disabled={loading} />
+        <button onClick={addProduct} className={`px-4 py-2 ${brandYellowBg} rounded font-semibold text-black`} disabled={loading}>{loading ? "Adding..." : "Add"}</button>
       </div>
       <div>
         <h3 className={`text-2xl mb-4 ${brandYellow}`}>Existing Products</h3>
@@ -187,7 +204,7 @@ const Admin = () => {
               <img src={p.img} className="w-32 h-32 object-contain mb-2" alt={p.name} />
               <h4 className={brandYellow}>{p.name}</h4>
               <p className="text-gray-300">Price: {p.price} MWK</p>
-              <button onClick={() => deleteProduct(p.id)} className={`mt-2 px-3 py-1 rounded ${brandYellowBg} text-black`}>Delete</button>
+              <button onClick={() => deleteProduct(p.id)} className={`mt-2 px-3 py-1 rounded ${brandYellowBg} text-black`} disabled={loading}>Delete</button>
             </div>
           ))}
         </div>
@@ -196,9 +213,9 @@ const Admin = () => {
   );
 };
 
-const AdminWrapper = () => {
+const AdminWrapper = ({ products, onProductsChange }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  return isLoggedIn ? <Admin /> : <AdminLogin onLogin={setIsLoggedIn} />;
+  return isLoggedIn ? <Admin products={products} onProductsChange={onProductsChange} /> : <AdminLogin onLogin={setIsLoggedIn} />;
 };
 
 const Footer = () => (
@@ -213,18 +230,42 @@ const Footer = () => (
 );
 
 export default function OnsetNation() {
+  const [products, setProducts] = useState(initialProducts);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, "products"));
+        const firebaseProducts = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        if (firebaseProducts.length > 0) {
+          setProducts(firebaseProducts);
+        }
+      } catch (error) {
+        console.error("Error fetching products from Firebase:", error);
+      }
+      setLoading(false);
+    };
+    fetchProducts();
+  }, []);
+
+  if (loading) return <div className="min-h-screen bg-black text-white flex items-center justify-center"><p>Loading...</p></div>;
+
   return (
     <Router>
       <div className="min-h-screen bg-black text-white">
         <Navbar />
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/shop" element={<Shop />} />
+          <Route path="/shop" element={<Shop products={products} />} />
           <Route path="/gallery" element={<Gallery />} />
           <Route path="/philosophy" element={<Philosophy />} />
           <Route path="/contact" element={<Contact />} />
-          <Route path="/product/:id" element={<ProductPage />} />
-          <Route path="/admin" element={<AdminWrapper />} />
+          <Route path="/product/:id" element={<ProductPage products={products} />} />
+          <Route path="/admin" element={<AdminWrapper products={products} onProductsChange={setProducts} />} />
         </Routes>
         <Footer />
       </div>
