@@ -37,16 +37,15 @@ const Navbar = () => (
 
 /* Home */
 const Home = () => (
-  <div className="p-6">
-    <motion.section className="mt-16 text-center relative p-16 rounded-2xl" initial={{ opacity: 0, y: -50 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1 }} style={{ backgroundImage: "url(/hero-bg.jpg)", backgroundSize: "cover", backgroundPosition: "center" }}>
-      <motion.img src="/onsettt.png" alt="Onset Nation" className="h-24 w-auto mx-auto mb-6" initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ duration: 0.8 }} />
-      <h2 className={`text-5xl font-bold mb-4 ${brandYellow}`}>Wear Your Beginning</h2>
-      <p className="text-gray-300 max-w-2xl mx-auto text-lg">Onset Nation is more than a brand  it is ambition, identity, hustle, and new beginnings.</p>
-      <Link to="/shop">
-        <motion.button className={`mt-8 px-6 py-3 rounded-xl font-semibold ${brandYellowBg} text-black`} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>Shop Now</motion.button>
-      </Link>
-    </motion.section>
-  </div>
+  <section className="text-center py-20">
+    <img 
+      src="/onsettt.png" 
+      alt="Onset Nation Logo" 
+      className="h-32 mx-auto mb-6"
+    />
+    <h1 className="text-5xl font-extrabold text-red-600">Onset Nation</h1>
+    <p className="text-xl mt-4 text-gray-700">Wear Your Identity • Own Your Journey</p>
+  </section>
 );
 
 /* Shop - Uses Firebase */
