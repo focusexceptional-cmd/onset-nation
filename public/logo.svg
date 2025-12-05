@@ -1,0 +1,12 @@
+﻿<!-- SVG representation of your Onset Nation red logo -->
+<svg width="400" height="200" viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Red 'N' circle and text logo -->
+  <circle cx="60" cy="100" r="50" fill="none" stroke="#E63946" stroke-width="8"/>
+  <path d="M 40 70 L 80 130 M 80 70 L 40 130" stroke="#E63946" stroke-width="12" stroke-linecap="round"/>
+  
+  <!-- ONSET text -->
+  <text x="130" y="110" font-size="72" font-weight="bold" fill="#E63946" font-family="Arial, sans-serif">ONSET</text>
+  
+  <!-- NATION text -->
+  <text x="130" y="170" font-size="72" font-weight="bold" fill="#E63946" font-family="Arial, sans-serif">NATION</text>
+</svg>
