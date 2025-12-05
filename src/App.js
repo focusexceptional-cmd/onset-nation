@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Link, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { db } from "./firebase";
@@ -17,7 +17,7 @@ const initialProducts = [
 const Navbar = () => (
   <header className="flex justify-between items-center py-4 px-6 bg-black border-b border-white/10">
     <Link to="/" className="flex items-center gap-2">
-      <img src="/logo.png" alt="Onset Nation" className="h-12 w-auto" />
+      <img src="/logo.svg" alt="Onset Nation" className="h-12 w-auto" />
     </Link>
     <nav className="flex gap-6 text-lg">
       <Link to="/" className="hover:text-gray-300">Home</Link>
@@ -34,7 +34,7 @@ const Navbar = () => (
 const Home = () => (
   <div className="p-6">
     <motion.section className="mt-16 text-center relative p-16 rounded-2xl" initial={{ opacity: 0, y: -50 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1 }} style={{ backgroundImage: "url(/hero-bg.jpg)", backgroundSize: "cover", backgroundPosition: "center" }}>
-      <motion.img src="/logo.png" alt="Onset Nation" className="h-24 w-auto mx-auto mb-6" initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ duration: 0.8 }} />
+      <motion.img src="/logo.svg" alt="Onset Nation" className="h-24 w-auto mx-auto mb-6" initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ duration: 0.8 }} />
       <h2 className={`text-5xl font-bold mb-4 ${brandYellow}`}>Wear Your Beginning</h2>
       <p className="text-gray-300 max-w-2xl mx-auto text-lg">Onset Nation is more than a brand  it is ambition, identity, hustle, and new beginnings.</p>
       <Link to="/shop">
@@ -223,7 +223,7 @@ const AdminWrapper = ({ products, onProductsChange }) => {
 
 const Footer = () => (
   <footer className="text-center text-gray-500 py-6 mt-12 border-t border-white/10">
-    <img src="/logo.png" alt="Onset Nation" className="h-12 w-auto mx-auto mb-4" />
+    <img src="/logo.svg" alt="Onset Nation" className="h-12 w-auto mx-auto mb-4" />
     <div className="flex justify-center gap-8 mb-4">
       <Link to="/shop" className="hover:text-gray-300">Shop</Link>
       <Link to="/gallery" className="hover:text-gray-300">Gallery</Link>
